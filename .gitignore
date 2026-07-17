@@ -1,0 +1,12 @@
+# .gitignore file
+
+*.tmp
+*.psd
+*.bak
+*.sfk
+*.b#?
+*.s#?
+*.zip
+*.sch
+*.lnk
+*.gcode
