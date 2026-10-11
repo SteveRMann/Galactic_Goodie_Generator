@@ -5,11 +5,13 @@ Opening door after index delay
 Door: OPEN
 OPEN: UP limit switch hit
 Door: STOPPED
-Cup removed â†’ starting 1-second close delay
-Cup gone for 1 second â†’ closing door
+Cup removed, starting 1-second close delay
+Cup gone for 1 second, closing door
 Door: CLOSE
 CLOSE: DOWN limit switch hit
 Door: STOPPED
+
+
 Normal cycle- ttState=TT_CLEARING
 Clearing finished -> ttState=TT_SEEKING
 Seeking finished -> ttState=TT_IDLE
@@ -22,6 +24,8 @@ Cup gone for 1 second â†’ closing door
 Door: CLOSE
 CLOSE: DOWN limit switch hit
 Door: STOPPED
+
+
 Normal cycle- ttState=TT_CLEARING
 Clearing finished -> ttState=TT_SEEKING
 Seeking finished -> ttState=TT_IDLE
@@ -34,6 +38,8 @@ Cup gone for 1 second â†’ closing door
 Door: CLOSE
 CLOSE: DOWN limit switch hit
 Door: STOPPED
+
+
 Normal cycle- ttState=TT_CLEARING
 Clearing finished -> ttState=TT_SEEKING
 Seeking finished -> ttState=TT_IDLE
@@ -46,39 +52,4 @@ Cup gone for 1 second â†’ closing door
 Door: CLOSE
 CLOSE: DOWN limit switch hit
 Door: STOPPED
-Normal cycle- ttState=TT_CLEARING
-Clearing finished -> ttState=TT_SEEKING
-Seeking finished -> ttState=TT_IDLE
-Opening door after index delay
-Door: OPEN
-OPEN: UP limit switch hit
-Cup removed â†’ starting 1-second close delay
-Door: STOPPED
-Cup gone for 1 second â†’ closing door
-Door: CLOSE
-CLOSE: DOWN limit switch hit
-Door: STOPPED
-Normal cycle- ttState=TT_CLEARING
-Clearing finished -> ttState=TT_SEEKING
-Seeking finished -> ttState=TT_IDLE
-Opening door after index delay
-Door: OPEN
-OPEN: UP limit switch hit
-Cup removed â†’ starting 1-second close delay
-Door: STOPPED
-Cup gone for 1 second â†’ closing door
-Door: CLOSE
-CLOSE: DOWN limit switch hit
-Door: STOPPED
-Normal cycle- ttState=TT_CLEARING
-Clearing finished -> ttState=TT_SEEKING
-Seeking finished -> ttState=TT_IDLE
-Opening door after index delay
-Door: OPEN
-OPEN: UP limit switch hit
-Cup removed â†’ starting 1-second close delay
-Door: STOPPED
-Cup gone for 1 second â†’ closing door
-Door: CLOSE
-CLOSE: DOWN limit switch hit
-Door: STOPPED
+

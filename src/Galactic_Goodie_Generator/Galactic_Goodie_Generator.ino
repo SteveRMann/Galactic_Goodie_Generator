@@ -417,6 +417,7 @@ void updateTurntable() {
         if (trig && !lastTrig) {
           ttForward();
           ttState = TT_CLEARING;
+          Serial.println();
           Serial.println("Normal cycle- ttState=TT_CLEARING");
         }
 
