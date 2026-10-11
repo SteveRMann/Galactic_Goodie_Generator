@@ -597,6 +597,7 @@ void setup() {
   delay(500);  // give USB/IDE time to attach
   Serial.begin(115200);
   delay(200);
+  Serial.println();
   Serial.println("\nStarting Galactic Goodie Generator V17");
 
   // Configure the ESP pins
