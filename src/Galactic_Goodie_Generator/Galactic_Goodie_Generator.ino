@@ -19,7 +19,7 @@
 // V21- Stable, door stays open during loading.
 // ===============================================================
 
-#define VERSION 21
+#define VERSION 2
 /*
 Expected performance:
 Idle: Wait for user to press the trigger button. (Or the Load button).
