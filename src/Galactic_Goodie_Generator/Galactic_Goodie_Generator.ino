@@ -19,6 +19,7 @@
 // V21- Stable, door stays open during loading.
 // ===============================================================
 
+#define VERSION 21
 /*
 Expected performance:
 Idle: Wait for user to press the trigger button. (Or the Load button).
@@ -598,7 +599,8 @@ void setup() {
   Serial.begin(115200);
   delay(200);
   Serial.println();
-  Serial.println("\nStarting Galactic Goodie Generator V17");
+  Serial.print("\nStarting Galactic Goodie Generator Version ");
+  Serial.println(VERSION);
 
   // Configure the ESP pins
   pinMode(IA_A, OUTPUT);
