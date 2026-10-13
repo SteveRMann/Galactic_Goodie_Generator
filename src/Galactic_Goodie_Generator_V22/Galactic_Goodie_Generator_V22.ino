@@ -18,6 +18,8 @@
 // V20- Keep the door open during loading.
 // V21- Stable, door stays open during loading.
 // V22- Added MCP reset watchdog
+//      Trigger event → normal cycle (only if the door is fully closed)
+//      Debounce the TOF sensor (cup or hand present)
 // ===============================================================
 
 #define VERSION 22
@@ -278,6 +280,7 @@ void ttStop() {
 }
 
 
+/*
 // =========================
 // Cup detector
 // =========================
@@ -292,6 +295,41 @@ bool cupDetector() {
   return false;
 }
 #endif
+*/
+
+
+// =========================
+// Cup detector
+// =========================
+const uint8_t TOF_DEBOUNCE_COUNT = 3;  // consecutive readings needed to change state (3 x 50 ms = 150 ms)
+
+#if USE_TOF
+bool cupDetectorRaw() {
+  VL53L0X_RangingMeasurementData_t measure;
+  lox.rangingTest(&measure, false);
+  if (measure.RangeStatus == 4) return false;  // invalid / out of range → treat as empty
+  return (measure.RangeMilliMeter < CUP_DISTANCE);
+}
+
+bool cupDetector() {
+  static bool stableState = false;
+  static uint8_t count = 0;
+
+  bool raw = cupDetectorRaw();
+  if (raw == stableState) {
+    count = 0;  // reading agrees with current state, reset the counter
+  } else if (++count >= TOF_DEBOUNCE_COUNT) {
+    stableState = raw;  // enough consecutive disagreeing readings, accept the change
+    count = 0;
+  }
+  return stableState;
+}
+#else
+bool cupDetector() {
+  return false;
+}
+#endif
+
 
 
 // =========================
@@ -415,12 +453,27 @@ void updateTurntable() {
         bool trig = (debounceRead(dbTrigger) == LOW);
         bool load = (debounceRead(dbLoad) == LOW);
 
+        /*
         // Trigger event → normal cycle
         if (trig && !lastTrig) {
           ttForward();
           ttState = TT_CLEARING;
           Serial.println();
           Serial.println("Normal cycle- ttState=TT_CLEARING");
+        }
+*/
+
+        // Trigger event → normal cycle (only if the door is fully closed)
+        if (trig && !lastTrig) {
+          bool doorClosed = (mcp.digitalRead(DN_SWITCH) == LOW && doorMotor == MOTOR_STOP);
+          if (doorClosed) {
+            ttForward();
+            ttState = TT_CLEARING;
+            Serial.println();
+            Serial.println("Normal cycle- ttState=TT_CLEARING");
+          } else {
+            Serial.println("Trigger ignored - door not closed");
+          }
         }
 
         // Load event → loading cycle
