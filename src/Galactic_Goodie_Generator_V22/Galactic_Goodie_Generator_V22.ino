@@ -20,6 +20,7 @@
 // V22- Added MCP reset watchdog
 //      Trigger event → normal cycle (only if the door is fully closed)
 //      Debounce the TOF sensor (cup or hand present)
+//      When door closes, open it a few ms to maintain tension on the string.
 // ===============================================================
 
 #define VERSION 22
@@ -61,10 +62,11 @@ Adafruit_MCP23X17 mcp;
 //const uint32_t PAUSE_TIME = 1000;  // (legacy, no longer used in TT_LOADING)
 const uint32_t CUP_LOAD_DELAY = 2000;  // Delay after cup detected before rotating to next index
 const uint32_t CLEARING_TIME = 500;
-const uint32_t CUP_DISTANCE = 200;  // Distance in mm that is an object in the chamber. Anything more is false.
-const uint32_t TT_BRAKE_TIME = 50;  // 50 ms reverse
-const uint32_t OPEN_TIME = 10000;   // safety only
-const uint32_t CLOSE_TIME = 10000;  // safety only
+const uint32_t CUP_DISTANCE = 200;      // Distance in mm that is an object in the chamber. Anything more is false.
+const uint32_t TT_BRAKE_TIME = 50;      // 50 ms reverse
+const uint32_t OPEN_TIME = 10000;       // safety only
+const uint32_t CLOSE_TIME = 10000;      // safety only
+const uint32_t DOOR_BACKOFF_TIME = 80;  // ms of open-direction drive after the DOWN switch closes
 
 
 // =========================
@@ -176,6 +178,8 @@ enum DoorMotorState { MOTOR_OPEN,
                       MOTOR_STOP };
 DoorMotorState doorMotor = MOTOR_STOP;
 DoorMotorState lastDoorMotor = MOTOR_STOP;
+bool doorBackoffActive = false;
+uint32_t doorBackoffStart = 0;
 
 uint32_t openStartTime = 0;
 uint32_t closeStartTime = 0;
@@ -346,6 +350,17 @@ void updateDoorMotor() {
     lastDoorMotor = doorMotor;
   }
 
+
+  // Post-close back-off pulse (non-blocking)
+  if (doorBackoffActive) {
+    if (doorMotor == MOTOR_STOP && millis() - doorBackoffStart < DOOR_BACKOFF_TIME) {
+      doorOpen();  // brief reverse to set tension
+      return;
+    }
+    doorBackoffActive = false;
+    if (doorMotor == MOTOR_STOP) doorStop();
+  }
+
   switch (doorMotor) {
     case MOTOR_OPEN:
       doorOpen();
@@ -383,12 +398,28 @@ void updateDoorMotor() {
         break;
       }
 
+      /*
       // DOWN limit switch
       if (mcp.digitalRead(DN_SWITCH) == LOW) {
         doorStop();
         Serial.println("CLOSE: DOWN limit switch hit");
         doorMotor = MOTOR_STOP;
         ttLoadingForceClose = false;
+        break;
+      }
+      */
+
+      // DOWN limit switch
+      if (mcp.digitalRead(DN_SWITCH) == LOW) {
+        digitalWrite(IA_A, HIGH);  // TB6612 short brake (both inputs HIGH)
+        mcp.digitalWrite(IB_A, HIGH);
+        delay(30);  // let the motor stop before the back-off reverse
+        doorStop();
+        Serial.println("CLOSE: DOWN limit switch hit");
+        doorMotor = MOTOR_STOP;
+        ttLoadingForceClose = false;
+        doorBackoffActive = true;  // start tension back-off pulse
+        doorBackoffStart = millis();
         break;
       }
 
